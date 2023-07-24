@@ -1,0 +1,11 @@
+
+# Plugin \Drupal\ckeditor_media_resize\Plugin\CKEditor5Plugin\MediaResize
+ckeditor5.plugin.ckeditor_media_resize_mediaResize:
+  type: mapping
+  label: Media Resize
+  mapping:
+    allow_resize:
+      type: boolean
+      label: 'Allow resize'
+      constraints:
+        NotNull: []
