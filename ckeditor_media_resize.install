@@ -13,7 +13,7 @@ use Drupal\Core\Config\FileStorage;
 /**
  * Import config for dynamic resizing of images using image styles.
  */
-function ckeditor_media_resize_update_9001(&$sandbox) {
+function ckeditor_media_resize_post_update_image_style_config_import(&$sandbox) {
   $path = \Drupal::service('extension.list.module')->getPath('ckeditor_media_resize');
   $path .= '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
   $source = new FileStorage($path);
