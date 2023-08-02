@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 /**
  * @file
- * Install, update and uninstall functions for the Ckeditor Media Resize module.
+ * Post update functions for the Ckeditor Media Resize module.
  */
 
 use Drupal\Core\Config\InstallStorage;
