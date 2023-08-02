@@ -78,7 +78,7 @@ export default class MediaResizeHandles extends Plugin {
 			resizer = editor.plugins
 				.get( WidgetResize )
 				.attachTo( {
-					unit: editor.config.get( 'image.resizeUnit' ),
+					unit: editor.config.get( 'drupalMedia.resizeUnit' ),
 
 					modelElement: imageModel,
 					viewElement: widgetView,
