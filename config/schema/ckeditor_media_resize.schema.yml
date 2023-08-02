@@ -4,8 +4,14 @@ ckeditor5.plugin.ckeditor_media_resize_mediaResize:
   type: mapping
   label: Media Resize
   mapping:
-    allow_resize:
+    apply_image_styles:
       type: boolean
-      label: 'Allow resize'
+      label: 'Apply image styles'
       constraints:
-        NotNull: []
+        NotNull: [ ]
+    image_styles:
+      type: sequence
+      label: 'Resize image styles'
+      sequence:
+        type: string
+        label: 'Resize image style'

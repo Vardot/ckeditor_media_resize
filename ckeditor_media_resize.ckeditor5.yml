@@ -31,6 +31,4 @@ ckeditor_media_resize_mediaResize:
     conditions:
       filter: filter_resize_media
       toolbarItem: drupalMedia
-      requiresConfiguration:
-        allow_resize: true
       plugins: [media_media]
