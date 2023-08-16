@@ -6,6 +6,7 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Psr\Container\ContainerInterface;
@@ -25,6 +26,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
 
   protected EntityTypeManagerInterface $entityTypeManager;
   protected CKEditor5PluginManagerInterface $ckeditor5PluginManager;
+  protected CurrentRouteMatch $routeMatch;
 
   /**
    * {@inheritdoc}
@@ -33,6 +35,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     $instance = new static($configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->ckeditor5PluginManager = $container->get('plugin.manager.ckeditor5.plugin');
+    $instance->routeMatch = $container->get('current_route_match');
     return $instance;
   }
 
@@ -44,8 +47,14 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
       ->createInstance('ckeditor_media_resize_mediaResize');
     $ckeditor5_plugin_config = $ckeditor5_plugin->getConfiguration();
     $result = new FilterProcessResult($text);
-
     $data_attribute = 'data-media-width';
+
+    // Apply image styles only if the corresponding setting in the text format
+    // configuration is enabled and if this filter processing is NOT happening
+    // during the loading of the processed text inside the ckeditor.
+    $apply_image_styles = !empty($ckeditor5_plugin_config['apply_image_styles'])
+      && $this->routeMatch->getCurrentRouteMatch()->getRouteName() != 'media.filter.preview';
+
     if (stristr($text, $data_attribute) !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
@@ -53,7 +62,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
       foreach ($xpath->query('//*[@' . $data_attribute . ']') as $node) {
         [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
         $node->setAttribute('style', $attribute_value);
-        if (!empty($ckeditor5_plugin_config['apply_image_styles'])) {
+        if ($apply_image_styles) {
           $node->setAttribute(
             'data-view-mode',
             $this->getViewModeByWidth($width, $ckeditor5_plugin_config)
@@ -65,7 +74,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
         [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
         // If the figure was used on this media, apply the width to the figure.
         $node->parentNode->setAttribute('style', $attribute_value);
-        if (!empty($ckeditor5_plugin_config['apply_image_styles'])) {
+        if ($apply_image_styles) {
           $node->setAttribute(
             'data-view-mode',
             $this->getViewModeByWidth($width, $ckeditor5_plugin_config)
