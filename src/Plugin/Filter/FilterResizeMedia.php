@@ -16,7 +16,7 @@ use Psr\Container\ContainerInterface;
  * @Filter(
  *   id = "filter_resize_media",
  *   title = @Translation("Resize media images"),
- *   description = @Translation("Uses a <code>data-media-width</code> attribute on <code>&lt;drupal-media&gt;</code> tags to apply resizing of media images. This filter needs to run before the <strong>Embed media</strong> filter."),
+ *   description = @Translation("Uses a <code>data-media-width</code> attribute on <code>&lt;drupal-media&gt;</code> tags to apply resizing of media images. This filter needs to run before the <strong>Embed media</strong> filter and requires the <strong>Limit allowed HTML tags and correct faulty HTML</strong> to be active."),
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
  *   weight = 90,
  * )
@@ -101,7 +101,23 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     $width = $node->getAttribute($data_attribute);
     $node->removeAttribute($data_attribute);
     $attribute_value = $node->getAttribute('style');
-    $attribute_value .= $attribute_value . 'width:' . $width . ';';
+
+    // Replace existing width style with new one.
+    $styles = explode(';', $attribute_value);
+    $to_replace = '';
+    foreach ($styles as $style) {
+      if (\mb_strpos($style, 'width') === 0) {
+        $to_replace = $style;
+        break;
+      }
+    }
+    if ($to_replace) {
+      $attribute_value = str_replace($to_replace, 'width:' . $width, $attribute_value);
+    }
+    else {
+      $attribute_value = 'width:' . $width . ';';
+    }
+
     return [(int) $width, $attribute_value];
   }
 
