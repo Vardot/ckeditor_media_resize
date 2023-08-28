@@ -112,7 +112,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     $attribute_value = $node->getAttribute('style');
 
     // Replace existing width style with new one.
-    $styles = explode(';', $attribute_value);
+    $styles = \explode(';', $attribute_value);
     $to_replace = '';
     foreach ($styles as $style) {
       if (\mb_strpos($style, 'width') === 0) {
@@ -121,10 +121,10 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
       }
     }
     if ($to_replace) {
-      $attribute_value = str_replace($to_replace, 'width:' . $width, $attribute_value);
+      $attribute_value = \str_replace($to_replace, 'width:' . $width, $attribute_value);
     }
     else {
-      $attribute_value = 'width:' . $width . ';';
+      $attribute_value .= 'width:' . $width . ';';
     }
 
     return [(int) $width, $attribute_value];
