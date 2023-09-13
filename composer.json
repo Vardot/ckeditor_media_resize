@@ -1,0 +1,15 @@
+{
+    "name": "drupal/ckeditor_templates_upgrade",
+    "description": "Provides a ckeditor5 plugin that allows resizing of embedded image media.",
+    "type": "drupal-module",
+    "homepage": "https://drupal.org/project/ckeditor_media_resize",
+    "authors": [
+        {
+            "name": "Sebastian Leu",
+            "homepage": "https://www.drupal.org/u/s_leu",
+            "role": "Maintainer"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev"
+}
