@@ -49,36 +49,43 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     $result = new FilterProcessResult($text);
     $data_attribute = 'data-media-width';
 
+    // If the current route is 'media.filter.preview' the filter processing is
+    // applying for media upcasted during loading inside the editor.
+    $processing_in_editor = $this->routeMatch->getCurrentRouteMatch()->getRouteName() == 'media.filter.preview';
+
     // Apply image styles only if the corresponding setting in the text format
-    // configuration is enabled and if this filter processing is NOT happening
-    // during the loading of the processed text inside the ckeditor.
-    $apply_image_styles = !empty($ckeditor5_plugin_config['apply_image_styles'])
-      && $this->routeMatch->getCurrentRouteMatch()->getRouteName() != 'media.filter.preview';
+    // configuration is enabled and if the filter is NOT processing during the
+    // loading of the text inside the ckeditor.
+    $apply_image_styles = !empty($ckeditor5_plugin_config['apply_image_styles']) && !$processing_in_editor;
 
     if (stristr($text, $data_attribute) !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
       /** @var \DOMNode $node */
       foreach ($xpath->query('//*[@' . $data_attribute . ']') as $node) {
-        [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
-        $node->setAttribute('style', $attribute_value);
+        if (!$processing_in_editor) {
+          [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
+          $node->setAttribute('style', $attribute_value);
+        }
         if ($apply_image_styles) {
-          $node->setAttribute(
-            'data-view-mode',
-            $this->getViewModeByWidth($width, $ckeditor5_plugin_config)
-          );
+          $view_mode = $this->getViewModeByWidth($width, $ckeditor5_plugin_config);
+          if ($view_mode) {
+            $node->setAttribute('data-view-mode', $view_mode);
+          }
         }
       }
 
       foreach ($xpath->query('//figure/drupal-media[@' . $data_attribute . ']') as $node) {
-        [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
-        // If the figure was used on this media, apply the width to the figure.
-        $node->parentNode->setAttribute('style', $attribute_value);
+        if (!$processing_in_editor) {
+          [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
+          // If the figure was used on this media, apply width to the figure.
+          $node->parentNode->setAttribute('style', $attribute_value);
+        }
         if ($apply_image_styles) {
-          $node->setAttribute(
-            'data-view-mode',
-            $this->getViewModeByWidth($width, $ckeditor5_plugin_config)
-          );
+          $view_mode = $this->getViewModeByWidth($width, $ckeditor5_plugin_config);
+          if ($view_mode) {
+            $node->setAttribute('data-view-mode', $view_mode);
+          }
         }
       }
 
@@ -142,7 +149,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
         return $image_style_name;
       }
     }
-    return $image_style_name;
+    return '';
   }
 
   /**
@@ -155,7 +162,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
       foreach ($style->getEffects() as $effect) {
         $effect_config = $effect->getConfiguration();
         if (!empty($effect_config['data']['width'])) {
-          $width = max($width, $effect_config['data']['width']);
+          $width = \max($width, $effect_config['data']['width']);
         }
       }
       $widths[$name] = $width;
