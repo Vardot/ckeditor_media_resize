@@ -19,20 +19,25 @@ export default class MediaResizeEditing extends Plugin {
 		const editor = this.editor;
 		const resizeMediaCommand = new ResizeMediaCommand( editor );
 
-		this._registerSchema();
-		this._registerConverters();
-
 		// Register `resizeMediaImage` command.
 		editor.commands.add( 'resizeMediaImage', resizeMediaCommand );
 	}
+
+  /**
+   * @inheritDoc
+   */
+  afterInit() {
+    if ( this.editor.plugins.has( 'DrupalMediaEditing' ) ) {
+      this._registerSchema();
+      this._registerConverters();
+    }
+  }
 
 	/**
 	 * @private
 	 */
 	_registerSchema() {
-		if ( this.editor.plugins.has( 'DrupalMediaEditing' ) ) {
-			this.editor.model.schema.extend( 'drupalMedia', { allowAttributes: ['width', 'drupalMediaWidth', 'style'] } );
-		}
+    this.editor.model.schema.extend( 'drupalMedia', { allowAttributes: ['width', 'drupalMediaWidth', 'style'] } );
 	}
 
 	/**
