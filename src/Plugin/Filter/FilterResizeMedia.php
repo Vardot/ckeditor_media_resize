@@ -24,6 +24,8 @@ use Psr\Container\ContainerInterface;
  */
 class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInterface {
 
+  const RESIZE_WIDTH_DATA_ATTRIBUTE = 'data-media-width';
+
   protected EntityTypeManagerInterface $entityTypeManager;
   protected CKEditor5PluginManagerInterface $ckeditor5PluginManager;
   protected CurrentRouteMatch $routeMatch;
@@ -47,7 +49,6 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
       ->createInstance('ckeditor_media_resize_mediaResize');
     $ckeditor5_plugin_config = $ckeditor5_plugin->getConfiguration();
     $result = new FilterProcessResult($text);
-    $data_attribute = 'data-media-width';
 
     // If the current route is 'media.filter.preview' the filter processing is
     // applying for media upcasted during loading inside the editor.
@@ -58,41 +59,50 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     // loading of the text inside the ckeditor.
     $apply_image_styles = !empty($ckeditor5_plugin_config['apply_image_styles']) && !$processing_in_editor;
 
-    if (stristr($text, $data_attribute) !== FALSE) {
+    if (stristr($text, static::RESIZE_WIDTH_DATA_ATTRIBUTE) !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
-      /** @var \DOMNode $node */
-      foreach ($xpath->query('//*[@' . $data_attribute . ']') as $node) {
-        if (!$processing_in_editor) {
-          [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
-          $node->setAttribute('style', $attribute_value);
-        }
-        if ($apply_image_styles) {
-          $view_mode = $this->getViewModeByWidth($width, $ckeditor5_plugin_config);
-          if ($view_mode) {
-            $node->setAttribute('data-view-mode', $view_mode);
-          }
-        }
-      }
 
-      foreach ($xpath->query('//figure/drupal-media[@' . $data_attribute . ']') as $node) {
-        if (!$processing_in_editor) {
-          [$width, $attribute_value] = $this->getStyleAttributeFromNode($node, $data_attribute);
-          // If the figure was used on this media, apply width to the figure.
-          $node->parentNode->setAttribute('style', $attribute_value);
-        }
-        if ($apply_image_styles) {
-          $view_mode = $this->getViewModeByWidth($width, $ckeditor5_plugin_config);
-          if ($view_mode) {
-            $node->setAttribute('data-view-mode', $view_mode);
-          }
-        }
+      /** @var \DOMNode $node */
+      foreach ($xpath->query('//*[@' . static::RESIZE_WIDTH_DATA_ATTRIBUTE . ']') as $node) {
+        $this->processMediaDomNode($processing_in_editor, $node, $apply_image_styles, $ckeditor5_plugin_config);
+      }
+      /** @var \DOMNode $node */
+      foreach ($xpath->query('//figure/drupal-media[@' . static::RESIZE_WIDTH_DATA_ATTRIBUTE . ']') as $node) {
+        $this->processMediaDomNode($processing_in_editor, $node, $apply_image_styles, $ckeditor5_plugin_config);
       }
 
       $result->setProcessedText(Html::serialize($dom));
     }
 
     return $result;
+  }
+
+  /**
+   * Applies width, class and data attributes to passed media DOMNodes.
+   */
+  private function processMediaDomNode(bool $processing_in_editor, \DOMNode $node, bool $apply_image_styles, array $ckeditor5_plugin_config) : void {
+    if (!$processing_in_editor) {
+      [
+        $width,
+        $attribute_value
+      ] = $this->getStyleAttributeFromNode($node);
+      $node->setAttribute('style', $attribute_value);
+
+      // Set a class that allows to style resized media.
+      $node->setAttribute(
+        'class',
+        $node->getAttribute('class')
+          ? $node->getAttribute('class') . ' media-embed-resized'
+          : 'media-embed-resized'
+      );
+    }
+    if ($apply_image_styles) {
+      $view_mode = $this->getViewModeByWidth($width, $ckeditor5_plugin_config);
+      if ($view_mode) {
+        $node->setAttribute('data-view-mode', $view_mode);
+      }
+    }
   }
 
   /**
@@ -113,9 +123,9 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
   /**
    * Gets appended $width style attribute and for given node and attribute.
    */
-  public function getStyleAttributeFromNode(\DOMNode $node, string $data_attribute): array {
-    $width = $node->getAttribute($data_attribute);
-    $node->removeAttribute($data_attribute);
+  public function getStyleAttributeFromNode(\DOMNode $node): array {
+    $width = $node->getAttribute(static::RESIZE_WIDTH_DATA_ATTRIBUTE);
+    $node->removeAttribute(static::RESIZE_WIDTH_DATA_ATTRIBUTE);
     $attribute_value = $node->getAttribute('style');
 
     // Replace existing width style with new one.
