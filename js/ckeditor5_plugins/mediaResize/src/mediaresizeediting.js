@@ -1,8 +1,6 @@
 import { Plugin } from 'ckeditor5/src/core';
 import ResizeMediaCommand from './resizemediacommand';
 
-const MEDIA_WIDTH_DATA_ATTRIBUTE = 'data-media-width';
-
 export default class MediaResizeEditing extends Plugin {
 
 	/**
@@ -46,6 +44,7 @@ export default class MediaResizeEditing extends Plugin {
 	_registerConverters() {
     const elementType = 'drupalMedia';
 		const editor = this.editor;
+    const resizeWidthAttribute = editor.config._config.drupalMedia.dataAttribute;
 
 		// Converts the 'width' property of a drupalMedia model into attributes on a
     // <drupal-media> tag.
@@ -67,11 +66,11 @@ export default class MediaResizeEditing extends Plugin {
           // renders the media via the resize_media_filter. It's also used to
           // set the width on the drupalMedia model when the editor loads via
           // the upcast converter below.
-          viewWriter.setAttribute( MEDIA_WIDTH_DATA_ATTRIBUTE, data.attributeNewValue, mediaView );
+          viewWriter.setAttribute( resizeWidthAttribute, data.attributeNewValue, mediaView );
 					viewWriter.addClass( 'image_resized', mediaView );
 				} else {
 					viewWriter.removeStyle( 'width', mediaView );
-          viewWriter.removeAttribute( MEDIA_WIDTH_DATA_ATTRIBUTE, mediaView );
+          viewWriter.removeAttribute( resizeWidthAttribute, mediaView );
 					viewWriter.removeClass( 'image_resized', mediaView );
 				}
 			} )
@@ -82,7 +81,7 @@ export default class MediaResizeEditing extends Plugin {
     editor.conversion.for( 'upcast' ).add( dispatcher =>
       dispatcher.on( `element:drupal-media`, ( evt, data, conversionApi ) => {
         const { schema, writer } = conversionApi;
-        const mediaWidth = data.viewItem.getAttribute( MEDIA_WIDTH_DATA_ATTRIBUTE );
+        const mediaWidth = data.viewItem.getAttribute( resizeWidthAttribute );
 
         // Do not go for the model element after data.modelCursor because it might happen
         // that a single view element was converted to multiple model elements. Get all of them.

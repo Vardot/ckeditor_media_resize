@@ -24,11 +24,10 @@ use Psr\Container\ContainerInterface;
  */
 class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInterface {
 
-  const RESIZE_WIDTH_DATA_ATTRIBUTE = 'data-media-width';
-
   protected EntityTypeManagerInterface $entityTypeManager;
   protected CKEditor5PluginManagerInterface $ckeditor5PluginManager;
   protected CurrentRouteMatch $routeMatch;
+  protected string $resizeWidthAttribute;
 
   /**
    * {@inheritdoc}
@@ -48,6 +47,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     $ckeditor5_plugin = $this->ckeditor5PluginManager
       ->createInstance('ckeditor_media_resize_mediaResize');
     $ckeditor5_plugin_config = $ckeditor5_plugin->getConfiguration();
+    $this->resizeWidthAttribute = $ckeditor5_plugin->getPluginDefinition()->toArray()['ckeditor5']['config']['drupalMedia']['dataAttribute'];
     $result = new FilterProcessResult($text);
 
     // If the current route is 'media.filter.preview' the filter processing is
@@ -59,16 +59,16 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     // loading of the text inside the ckeditor.
     $apply_image_styles = !empty($ckeditor5_plugin_config['apply_image_styles']) && !$processing_in_editor;
 
-    if (stristr($text, static::RESIZE_WIDTH_DATA_ATTRIBUTE) !== FALSE) {
+    if (stristr($text, $this->resizeWidthAttribute) !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
 
       /** @var \DOMNode $node */
-      foreach ($xpath->query('//*[@' . static::RESIZE_WIDTH_DATA_ATTRIBUTE . ']') as $node) {
+      foreach ($xpath->query('//*[@' . $this->resizeWidthAttribute . ']') as $node) {
         $this->processMediaDomNode($processing_in_editor, $node, $apply_image_styles, $ckeditor5_plugin_config);
       }
       /** @var \DOMNode $node */
-      foreach ($xpath->query('//figure/drupal-media[@' . static::RESIZE_WIDTH_DATA_ATTRIBUTE . ']') as $node) {
+      foreach ($xpath->query('//figure/drupal-media[@' . $this->resizeWidthAttribute . ']') as $node) {
         $this->processMediaDomNode($processing_in_editor, $node, $apply_image_styles, $ckeditor5_plugin_config);
       }
 
@@ -123,9 +123,9 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
   /**
    * Gets appended $width style attribute and for given node and attribute.
    */
-  public function getStyleAttributeFromNode(\DOMNode $node): array {
-    $width = $node->getAttribute(static::RESIZE_WIDTH_DATA_ATTRIBUTE);
-    $node->removeAttribute(static::RESIZE_WIDTH_DATA_ATTRIBUTE);
+  private function getStyleAttributeFromNode(\DOMNode $node): array {
+    $width = $node->getAttribute($this->resizeWidthAttribute);
+    $node->removeAttribute($this->resizeWidthAttribute);
     $attribute_value = $node->getAttribute('style');
 
     // Replace existing width style with new one.
@@ -150,7 +150,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
   /**
    * Determines which view mode the resized media image should be rendered with.
    */
-  protected function getViewModeByWidth(int $width, array $ckeditor5_plugin_config): string {
+  private function getViewModeByWidth(int $width, array $ckeditor5_plugin_config): string {
     $image_styles = $this->entityTypeManager->getStorage('image_style')
       ->loadMultiple($ckeditor5_plugin_config['image_styles']);
     $image_styles_widths_map = $this->getImageStyleWidths($image_styles);
@@ -165,7 +165,7 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
   /**
    * Extracts width options from given image styles and their effects.
    */
-  protected function getImageStyleWidths(array $image_styles): array {
+  private function getImageStyleWidths(array $image_styles): array {
     $widths = [];
     foreach ($image_styles as $name => $style) {
       $width = 0;
