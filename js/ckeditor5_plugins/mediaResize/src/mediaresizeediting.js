@@ -35,7 +35,7 @@ export default class MediaResizeEditing extends Plugin {
 	 * @private
 	 */
 	_registerSchema() {
-    this.editor.model.schema.extend( 'drupalMedia', { allowAttributes: ['width', 'drupalMediaWidth', 'style'] } );
+    this.editor.model.schema.extend( 'drupalMedia', { allowAttributes: ['width'] } );
 	}
 
 	/**
