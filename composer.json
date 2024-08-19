@@ -11,5 +11,7 @@
         }
     ],
     "license": "GPL-2.0-or-later",
-    "minimum-stability": "dev"
+    "require": {
+        "drupal/core": "^10.3.0 || ^11"
+    }
 }
