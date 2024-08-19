@@ -23,7 +23,7 @@ Install as you would normally install a contributed Drupal module. For further i
 ## Configuration
 
 1. Enable the module at Administration > Extend.
-2. Add the "Media image resize" filter on a requested text format.
+2. Add the "Resize media images" filter on a requested text format.
 
 
 ## Development / Contributing
