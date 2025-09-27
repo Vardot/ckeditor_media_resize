@@ -112,11 +112,11 @@ class FilterResizeMedia extends FilterBase implements ContainerFactoryPluginInte
     if ($long) {
       return $this->t('
         <p>Applies the resizing on embedded media images inside ckeditor5 generated content when rendering the ckeditor content in Drupal.</p>
-        <p>This works via a the <code>data-media-width</code> attribute on <code><drupal-media></code> tags, for example: <code><drupal-media data-media-width="50%"</code>.</p>
+        <p>This works via a the <code>data-media-width</code> attribute on <code><drupal-media /></code> tags, for example: <code><drupal-media data-media-width="50%" /></code>.</p>
       ');
     }
     else {
-      return $this->t('You can resize media images by adding the <code>data-media-width</code> attribute on <code><drupal-media></code> tags, for example: <code><drupal-media data-media-width="50%"</code>.');
+      return $this->t('You can resize media images by adding the <code>data-media-width</code> attribute on <code><drupal-media /></code> tags, for example: <code><drupal-media data-media-width="50%" /></code>.');
     }
   }
 
