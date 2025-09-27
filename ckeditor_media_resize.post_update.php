@@ -27,3 +27,27 @@ function ckeditor_media_resize_post_update_image_style_config_import(&$sandbox) 
     }
   }
 }
+
+/**
+ * Set the dependencies on the custom image styles.
+ */
+function ckeditor_media_resize_post_update_config_dependencies() {
+  $config_factory = \Drupal::configFactory();
+
+  $config_names = [
+    'image.style.cke_media_resize_large',
+    'image.style.cke_media_resize_medium',
+    'image.style.cke_media_resize_small',
+    'image.style.cke_media_resize_xl',
+  ];
+  $dependencies['enforced']['module'][] = 'ckeditor_media_resize';
+
+  // Fix the configurations if the dependency is not set.
+  foreach ($config_names as $config_name) {
+    $config = $config_factory->getEditable($config_name);
+    if ($config) {
+      $config->set('dependencies', $dependencies);
+      $config->save(TRUE);
+    }
+  }
+}

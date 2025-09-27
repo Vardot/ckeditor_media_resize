@@ -5,4 +5,5 @@ package: Custom
 core_version_requirement: ~10.3.0 || ~10.4.0 || ~11.0.0 || ~11.1.0
 dependencies:
   - drupal:ckeditor5
+  - drupal:image
   - drupal:media_library
