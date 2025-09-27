@@ -5,7 +5,7 @@
  * editor loads.
  *
  * Because it gets rendered on the server, we can't access that part of the
- * markup inside the CKEditor5 drupolMedia Model, and thus we can't the
+ * markup inside the CKEditor5 drupalMedia Model, and thus we can't the
  * inline style on the rendered part but only on the wrapping model. As a
  * result there are 2 inline styles in the editor, so we're resetting the
  * one on the rendered markup for correct display inside the editor.
