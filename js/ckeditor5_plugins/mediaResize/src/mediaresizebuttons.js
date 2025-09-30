@@ -1,14 +1,15 @@
-import { Plugin, icons } from 'ckeditor5/src/core';
+import { Plugin } from 'ckeditor5/src/core';
+import { IconObjectSizeSmall, IconObjectSizeMedium, IconObjectSizeLarge, IconObjectSizeFull } from 'ckeditor5/src/icons';
 import { ButtonView, DropdownButtonView, ViewModel, createDropdown, addListToDropdown } from 'ckeditor5/src/ui'
 import { CKEditorError, Collection } from 'ckeditor5/src/utils';
 
 import MediaResizeEditing from './mediaresizeediting';
 
 const RESIZE_ICONS = {
-	small: icons.objectSizeSmall,
-	medium: icons.objectSizeMedium,
-	large: icons.objectSizeLarge,
-	original: icons.objectSizeFull
+	small: IconObjectSizeSmall,
+	medium: IconObjectSizeMedium,
+	large: IconObjectSizeLarge,
+	original: IconObjectSizeFull
 };
 
 /**
