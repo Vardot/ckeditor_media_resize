@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * @file
  * Post update functions for the Ckeditor Media Resize module.
  */
+
+declare(strict_types=1);
 
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\FileStorage;

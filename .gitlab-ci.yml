@@ -47,8 +47,8 @@ cspell:
   allow_failure: false
 # eslint:
 #   allow_failure: false
-# phpcs:
-#   allow_failure: false
+phpcs:
+  allow_failure: false
 # phstan:
 #   allow_failure: false
 stylelint:
