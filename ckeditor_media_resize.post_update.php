@@ -45,7 +45,8 @@ function ckeditor_media_resize_post_update_config_dependencies() {
   // Fix the configurations if the dependency is not set.
   foreach ($config_names as $config_name) {
     $config = $config_factory->getEditable($config_name);
-    if ($config) {
+    // Only update existing configurations.
+    if (!$config->isNew()) {
       $config->set('dependencies', $dependencies);
       $config->save(TRUE);
     }
