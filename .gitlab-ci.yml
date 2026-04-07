@@ -45,6 +45,7 @@ composer-lint:
   allow_failure: false
 cspell:
   allow_failure: false
+# @todo Resolve test failures.
 # eslint:
 #   allow_failure: false
 phpcs:
