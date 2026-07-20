@@ -1,0 +1,25 @@
+{
+    "name": "vardot/ckeditor_media_resize",
+    "description": "Provides a CKEditor 5 plugin that allows resizing of embedded image media. Vardot fork of drupal/ckeditor_media_resize with Drupal core ~11.4 support (drupal.org issue #3607786).",
+    "type": "drupal-module",
+    "homepage": "https://github.com/vardot/ckeditor_media_resize",
+    "authors": [
+        {
+            "name": "Sebastian Leu",
+            "homepage": "https://www.drupal.org/u/s_leu",
+            "role": "Original maintainer"
+        },
+        {
+            "name": "Vardot",
+            "homepage": "https://github.com/vardot",
+            "role": "Fork maintainer"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "replace": {
+        "drupal/ckeditor_media_resize": "*"
+    },
+    "require": {
+        "drupal/core": "^10.5 || ~11.2.0 || ~11.3.0 || ~11.4.0"
+    }
+}
