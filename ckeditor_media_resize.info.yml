@@ -7,3 +7,8 @@ dependencies:
   - drupal:ckeditor5
   - drupal:image
   - drupal:media_library
+
+# Information added by Vardot packaging on 2026-11-25 (mirrors the Drupal.org packaging script).
+version: '2.0.1'
+project: 'ckeditor_media_resize'
+datestamp: 1795635306
